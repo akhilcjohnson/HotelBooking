@@ -1,0 +1,253 @@
+* {
+    box-sizing: border-box;
+  }
+html {
+    font-size: 10px;
+    font-family: 'Poppins', sans-serif;
+  }
+body{
+    padding: 0;
+    margin: 0;
+  }
+.main{
+    margin: auto;
+    max-width: 1500px;
+    width:100%;
+  }
+.topSearch{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin:2rem 2rem 0 0;
+}
+#inputSearch{
+    padding:.5rem 2rem .5rem 4rem;
+}
+.bellIcon{
+    width:1.5rem;
+}
+.front-head{
+    display:flex;
+    justify-content: space-between;
+    margin: 2rem;
+}
+.headPart{
+    font-size:2.4rem;
+}
+.headButton{
+    background-color:#3A66FF;
+    color: #fff;
+    border-radius:2rem;
+    border: none;
+    padding: 0 1rem;
+}
+.navigationContainer {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #E1E8FF; /* light grey background for better visibility */
+    border-radius: .5rem;
+    margin: 2rem
+}
+
+.yearNavigation, .monthNavigationContainer {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 5px;
+}
+
+#yearScrollContainer, #monthScrollContainer {
+    overflow: auto;
+    display: grid;
+}
+#yearGrid, #monthNavigation {
+    display: grid;
+    grid-auto-flow: column; /* Lays out the grid items in a row */
+    gap: 10px;
+}
+.yearButton, .monthButton {
+    text-align: center;
+    min-width: 50px; /* Ensures buttons have a uniform size */
+    cursor: pointer;
+    border: none; 
+    font-size:1.4rem;
+}
+/* Additional styles for buttons to improve visibility */
+.button:hover {
+    background-color: #000; /* Light gray background on hover */
+}
+button{
+    border:none;
+    background-color: #E1E8FF;
+}
+button.yearButton{
+    background-color: #E1E8FF;
+}
+
+.boxContainer{
+    display: flex;
+    justify-content: space-between; 
+}
+.dropBox{
+    display: flex;
+    margin: 0 2rem;
+    justify-content: space-evenly;
+}
+.search-box {
+    position: relative;
+    width: 25%;
+    margin: 0 2rem;
+}
+.search-box input[type="search"] {
+    width: 100%;
+    height: 100%;
+    padding-left: 4rem;
+    padding-right: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 2rem;
+}
+.search-box .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 1rem;
+}
+select {
+    font-size: 1.2rem;
+    border: 1px solid #ccc;
+    border-radius: 2rem;
+    padding: .5rem;
+}
+.zoom-button{
+    width: 5rem;
+    height: 3rem;
+    font-size: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 2rem;
+    background-color: #fff;
+    cursor: pointer;
+    padding: 0 1rem;
+}
+.filterButton  {
+    display: flex;
+    justify-content: space-evenly;
+    gap: .5rem;
+    border: 1px solid #ccc;
+    border-radius: 2rem;
+    background-color: #3A66FF;
+    cursor: pointer;
+    align-items: center;
+    color: #fff;
+    font-size: 1.2rem;
+    width: 15%
+}
+img{
+    width: 15%;
+}
+.checkboxContainer {
+    display: flex;
+    justify-content: flex-end; /* Aligns children to the right */
+    gap: 2rem; /* Adds space between the labels */
+    margin: 2rem 2rem 1rem 0; 
+}
+
+.checkboxContainer label {
+    display: flex;
+    align-items: center; 
+    position: relative; /* Ensures correct positioning for pseudo-elements */
+    margin: 0 1rem;
+}
+
+/* Hide the default checkbox */
+.checkboxContainer input[type="checkbox"] {
+    visibility: hidden;
+    position: absolute;
+}
+
+/* Style for the custom checkbox appearance */
+.checkboxContainer .checkmark {
+    position: relative;
+    height: 1rem;
+    width: 1rem;
+    background-color: #eee;
+    margin-right: .5rem ; /* Space between the checkbox and the label text */
+    display: inline-block; /* Necessary to keep label text aligned */
+}
+.checkboxContainer label:nth-child(1) .checkmark {
+    background-color: #D4EFFA;
+}
+
+.checkboxContainer label:nth-child(2) .checkmark {
+    background-color: #FEE5D3; 
+}
+
+.checkboxContainer label:nth-child(3) .checkmark {
+    background-color: #DEE4CC;
+}
+
+.table {
+    display: grid;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    width: 95%;
+}
+
+.table-header, .table-row {
+    display: flex; /* Use flexbox to align content horizontally */
+    justify-content: space-between;
+    align-items: center;
+}
+
+.table-header .date-row, .table-row .date-row {
+    display: flex;
+    flex-grow: 1; /* Allow date rows to fill available space */
+    justify-content: space-around; /* Space dates evenly */
+}
+
+.date {
+    width: 30px; /* Fixed width for each date */
+    text-align: center;
+    padding: 5px 0; /* Padding for visual spacing */
+}
+
+.table-header {
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.table-row {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
+.table-row:last-child {
+    border-bottom: none;
+}
+.calendar-grid {
+    display: grid;
+    border: 1px solid #fff;
+    margin-left: 2rem;
+    width: 96%;
+    border-radius:2rem
+}
+.calendar-row {
+    display: contents;
+}
+.room-type, .day-cell, .date-cell {
+    border: 1px solid #E3EAFF;
+    padding: 1.4rem .5rem;
+    font-weight: bold;
+    font-size:1.2rem;
+}
+.room-label,.room-number {
+    border: 1px solid #ccc;
+    padding: 8px;
+    border: 1px solid #E3EAFF;
+}
+.day-cell{
+    text-align:center;
+}
+

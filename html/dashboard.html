@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking Dashboard</title>
+    <link rel="stylesheet" href="/HotelBooking/styles.css">
+    <script src="/HotelBooking/js/bookingScript.js"></script>
+
+</head>
+<body>
+    <div class="main">
+        <div class="topSearch">
+            <div class="search-box" id="roomSearch">
+                <input type="search" id="inputSearch" placeholder="Search for rooms">
+                <span class="search-icon">&#x1F50D;</span>
+            </div>
+            <img src="/HotelBooking/images/free-bell-icon-860-thumb.png" class="bellIcon">
+        </div>
+        <div class="front-head">
+            <div class="headPart">Front Desk</div>
+            <button class="headButton">Create booking</button>
+        </div>
+        <div class="navigationContainer">
+            <div class="yearNavigation">
+                <button id="prevButton">&lt;</button>
+                <div id="yearScrollContainer">
+                    <div id="yearGrid">
+                        <!-- Years will be inserted here as buttons -->
+                    </div>
+                </div>
+                <button id="nextButton">&gt;</button>
+            </div>   
+            <div class="monthNavigationContainer">
+                <button id="prevMonthButton">&lt;</button>
+                <div id="monthScrollContainer">
+                    <div id="monthNavigation">
+                        <!-- Month buttons will be inserted here -->
+                    </div>
+                </div>
+                <button id="nextMonthButton">&gt;</button>
+            </div>
+        </div>
+        <div class="boxContainer">
+            <div class="search-box">
+                <input type="search" placeholder="Search Booking">
+                <span class="search-icon">&#x1F50D;</span>
+            </div>
+            <div class="dropBox">
+                    <button class="filterButton">
+                        <img src="/HotelBooking/images/icons8-align-64.png" alt="img">
+                        Filter
+                    </button>
+                <select name="reservation-type">
+                    <option value="">Reservation Type</option>
+                    <option value="standard">Standard</option>
+                    <option value="vip">VIP</option>
+                    <option value="group">Group</option>
+                </select>
+                <select name="room-type">
+                    <option value="">Room Type</option>
+                    <option value="single">Single</option>
+                    <option value="double">Double</option>
+                    <option value="suite">Suite</option>
+                </select>
+                <select name="floor">
+                    <option value="">Floor</option>
+                    <option value="1">1st Floor</option>
+                    <option value="2">2nd Floor</option>
+                    <option value="3">3rd Floor</option>
+                </select>
+                <button class="zoom-button" onclick="zoomIn()">+  -</button>
+            </div>
+        </div>
+        <div class="checkboxContainer">
+            <label>
+                <input type="checkbox">
+                <span class="checkmark"></span> <!-- Custom checkbox visual -->
+                Occupied
+            </label>
+            <label>
+                <input type="checkbox">
+                <span class="checkmark"></span> <!-- Custom checkbox visual -->
+                Reserved
+            </label>
+            <label>
+                <input type="checkbox">
+                <span class="checkmark"></span> <!-- Custom checkbox visual -->
+                Out of Order
+            </label>
+        </div>
+        <div id="calendarContainer" class="calendar-grid">
+        </div>
+    </div>
+</body>
+</html>

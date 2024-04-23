@@ -1,199 +1,213 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const totalYears = 15;
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const visibleDays = 12; // Number of days to display at a time
-    const floors = ["1st Floor", "2nd Floor", "3rd Floor"];
-    const reservationTypes = ["Deluxe","Standard", "VIP", "Group"];
-    const roomTypes = ["Single", "Double", "Family"];
-    const roomDetails = {
-        'Single Room': [101, 102, 103],
-        'Double Room': [201, 202, 203],
-        'Family Room': [301, 302, 303]
+// Data initialization
+const totalYears = 15;
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const visibleDays = 12;
+const floors = ["1st Floor", "2nd Floor", "3rd Floor"];
+const reservationTypes = ["Deluxe", "Standard", "VIP", "Group"];
+const roomTypes = ["Single", "Double", "Family"];
+const roomDetails = {
+    'Single Room': [101, 102, 103],
+    'Double Room': [201, 202, 203],
+    'Family Room': [301, 302, 303]
     };
-    let currentStartYear = 2011;
-    let selectedYear = new Date().getFullYear();
-    let selectedMonthIndex = 0;
-    let currentStartIndex = 0;
-    let zoomLevel = 1
+let currentStartYear = 2011;
+let selectedYear = new Date().getFullYear();
+let selectedMonthIndex = 0;
+let currentStartIndex = 0;
+let zoomLevel = 1;
 
-    const zoomInButton = document.getElementById('zoomImage')
-    const controls = setupControls();
-    
-    
-        function populateSelect(selectId, options, placeholder) {
-            const selectElement = document.getElementById(selectId);
-            const placeholderOption = document.createElement('option');  // Add placeholder option
-            placeholderOption.textContent = placeholder; // Placeholder text
-            placeholderOption.value = "";               // No value
-            placeholderOption.disabled = true;          // Disable selection
-            placeholderOption.selected = true;          // Set as default selected
-            selectElement.appendChild(placeholderOption);
-         
-            options.forEach(optionText => {     // Append each option
-                const option = document.createElement('option');
-                option.value = optionText;
-                option.textContent = optionText;
-                selectElement.appendChild(option);
-            });
-        }
-        // Populate selects on page load or appropriate event
-            populateSelect('reservationTypeSelect', reservationTypes, "Reservation Type");
-            populateSelect('roomTypeSelect', roomTypes, "Room Type");
-            populateSelect('floorSelect', floors, "Floor");
-        
+const createElement = (tagName, className, textContent = '') => {
+    const element = document.createElement(tagName);
+    element.className = className;
+    if (textContent) element.textContent = textContent;
+    return element;
+};
+const createButton = (container, className, text, onClick) => {
+    const button = createElement('button', className, text);
+    button.addEventListener('click', onClick);
+    container.appendChild(button);
+    return button;
+};
+const createOption = (text, value = "", isPlaceholder = false) => {
+    const option = document.createElement('option');
+    option.textContent = text;
+    option.value = value;
+    if (isPlaceholder) {
+        option.disabled = true;
+        option.selected = true;
+    }
+    return option;
+};
 
+// Function to populate select dropdowns
+const populateSelect = (selectId, options, placeholder) => {
+        const selectElement = document.getElementById(selectId);
+        selectElement.innerHTML = '';  // Clear existing options first
     
+        // Create and append the placeholder option
+        selectElement.appendChild(createOption(placeholder, "", true));
+    
+        // Create and append each option from the options array
+        options.forEach(optionText => {
+            selectElement.appendChild(createOption(optionText));
+        });
 
-    zoomInButton.addEventListener('click', () => {
-        zoomLevel += 0.1;  // Increment zoom level by 10%
-        document.body.style.zoom = zoomLevel;
+};
+
+// Setup UI controls for navigating the calendar
+const setupControls = () => {
+    const yearGrid = document.getElementById('yearGrid');
+    const monthNavigation = document.getElementById('monthNavigation');
+    monthNavigation.innerHTML = '';  // Clear to prevent duplication
+
+    // Setup month buttons
+    months.forEach((month, index) => {
+        createButton(monthNavigation, 'monthButton', month, () => {
+            selectedMonthIndex = index;
+            renderCalendar(selectedYear, selectedMonthIndex);
+        });
     });
-    function setupControls() {
-        const yearGrid = document.getElementById('yearGrid');
-        const monthNavigation = document.getElementById('monthNavigation');
-        const prevButton = document.getElementById('prevButton');
-        const nextButton = document.getElementById('nextButton');
-        const prevMonthButton = document.getElementById('prevMonthButton');
-        const nextMonthButton = document.getElementById('nextMonthButton');
 
-        months.forEach((month, index) => {
-            const monthButton = document.createElement('span');
-            monthButton.textContent = month;
-            monthButton.className = 'monthButton';
-            monthButton.addEventListener('click', () => {
-                selectedMonthIndex = index;
-                renderCalendar(selectedYear, selectedMonthIndex);
-            });
-            monthNavigation.appendChild(monthButton);
-        });
+    // Setup year and month navigation buttons
+    const setupNavigationButton = (buttonId, adjustmentFunction) => {
+        const button = document.getElementById(buttonId);
+        createButton(button, buttonId, button.innerText, adjustmentFunction);
+    };
+    setupNavigationButton('prevButton', () => adjustYear(-1));
+    setupNavigationButton('nextButton', () => adjustYear(1));
+    setupNavigationButton('prevMonthButton', () => adjustMonth(-visibleDays));
+    setupNavigationButton('nextMonthButton', () => adjustMonth(visibleDays));
+        
+    return { yearGrid, monthNavigation };
+};
 
-        const adjustSelectedYear = (currentSelected, start, total) => (currentSelected < start || currentSelected >= start + total) ? start : currentSelected;
-        prevButton.addEventListener('click', () => {
-            currentStartYear -= totalYears;
-            selectedYear = adjustSelectedYear(selectedYear, currentStartYear, totalYears);
-            populateYears(currentStartYear, totalYears);
-            renderCalendar(selectedYear, selectedMonthIndex);
-        });
-
-        nextButton.addEventListener('click', () => {
-            currentStartYear += totalYears;
-            selectedYear = adjustSelectedYear(selectedYear, currentStartYear, totalYears);
-            populateYears(currentStartYear, totalYears);
-            renderCalendar(selectedYear, selectedMonthIndex);
-        });
-
-        prevMonthButton.addEventListener('click', () => {
-            currentStartIndex = Math.max(0, currentStartIndex - visibleDays);
-            renderCalendar(selectedYear, selectedMonthIndex);
-        });
-
-        nextMonthButton.addEventListener('click', () => {
-            const daysInMonth = new Date(selectedYear, selectedMonthIndex + 1, 0).getDate();
-            currentStartIndex = Math.min(daysInMonth - visibleDays, currentStartIndex + visibleDays);
-            renderCalendar(selectedYear, selectedMonthIndex);
-        });
-
-        return { yearGrid, monthNavigation };
-    }
-
-    function populateYears(startYear, total) {
-        const { yearGrid } = controls;
-        yearGrid.innerHTML = '';
-        for (let year = startYear; year < startYear + total; year++) {
-            const yearButton = document.createElement('button');
-            yearButton.textContent = year;
-            yearButton.className = 'yearButton';
-            yearButton.addEventListener('click', () => {
-                selectedYear = year;
-                renderCalendar(selectedYear, selectedMonthIndex);
-            });
-            yearGrid.appendChild(yearButton);
-        }
-    }
-    
-    function renderCalendar(year, monthIndex) {
-        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-        const calendarContainer = document.getElementById('calendarContainer');
-        calendarContainer.innerHTML = '';
-        calendarContainer.style.gridTemplateColumns = `150px repeat(${visibleDays}, 1fr)`;
-    
-        // Header row for dates
-        const headerRow = document.createElement('div');
-        headerRow.className = 'calendar-row';
-        const roomLabelCell = document.createElement('div');
-        roomLabelCell.className = 'room-label';
-        roomLabelCell.textContent = 'Room';
-        headerRow.appendChild(roomLabelCell);
-    
-        for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
-            const date = new Date(year, monthIndex, day);
-            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-            const dayCell = document.createElement('div');
-            dayCell.className = 'day-cell';
-            dayCell.innerHTML = `<div>${dayName}</div><div>${day}</div>`;
-            headerRow.appendChild(dayCell);
-        }
-        calendarContainer.appendChild(headerRow);
-    
-        // Rows for room types and room numbers
-        Object.entries(roomDetails).forEach(([roomType, roomNumbers]) => {
-            const roomTypeRow = document.createElement('div');
-            roomTypeRow.className = 'calendar-row room-type-row';
-            const roomTypeCell = document.createElement('div');
-            roomTypeCell.className = 'room-type';
-            roomTypeCell.textContent = roomType;
-            roomTypeRow.appendChild(roomTypeCell);
-    
-            for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
-                const typeDateCell = document.createElement('div');
-                typeDateCell.className = 'date-cell';
-                typeDateCell.innerHTML = `<div><span class='total-box'>${roomNumbers.length}</span></div>`;
-                roomTypeRow.appendChild(typeDateCell);
-            }
-            calendarContainer.appendChild(roomTypeRow);
-    
-            roomNumbers.forEach(roomNumber => {
-                const roomNumberRow = document.createElement('div');
-                roomNumberRow.className = 'calendar-row room-number-row';
-                const roomNumberCell = document.createElement('div');
-                roomNumberCell.className = 'room-number';
-                roomNumberCell.textContent = roomNumber;
-                roomNumberRow.appendChild(roomNumberCell);
-    
-                for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
-                    const numberDateCell = document.createElement('div');
-                    numberDateCell.className = 'date-cell';
-                    roomNumberRow.appendChild(numberDateCell);
-                }
-                calendarContainer.appendChild(roomNumberRow);
-            });
-        });
-    
-        applyHoverEffects();
-    }
-    
+// Adjust the year by increments of 5 years
+const adjustYear = (direction) => {
+    currentStartYear += direction * 5;
+    selectedYear = adjustSelectedYear(selectedYear, currentStartYear, totalYears);
     populateYears(currentStartYear, totalYears);
     renderCalendar(selectedYear, selectedMonthIndex);
-    
-    function applyHoverEffects() {
-        const cells = document.querySelectorAll('.calendar-grid .date-cell, .calendar-grid .room-number');
-        cells.forEach(cell => {
-            cell.addEventListener('mouseenter', () => {
-                const row = cell.parentNode;
-                Array.from(row.children).forEach(child => child.classList.add('hover-effect'));
+};
 
-                const columnIndex = Array.from(row.children).indexOf(cell);
-                const allRows = document.querySelectorAll('.calendar-row');
-                allRows.forEach(currentRow => {
-                    if (currentRow.children[columnIndex]) {
-                        currentRow.children[columnIndex].classList.add('hover-effect');
-                    }
-                });
-            });
+// Adjust the month within the visible range
+const adjustMonth = (increment) => {
+    const daysInMonth = new Date(selectedYear, selectedMonthIndex + 1, 0).getDate();
+    currentStartIndex = Math.max(0, Math.min(daysInMonth - visibleDays, currentStartIndex + increment));
+    renderCalendar(selectedYear, selectedMonthIndex);
+};
 
-            cell.addEventListener('mouseleave', () => {
-                document.querySelectorAll('.hover-effect').forEach(hovered => hovered.classList.remove('hover-effect'));
-            });
+// Ensure the selected year remains within a logical range
+const adjustSelectedYear = (currentSelected, start, total) => {
+    return (currentSelected < start || currentSelected >= start + total) ? start : currentSelected;
+};
+
+// Populate the year buttons
+const populateYears = (startYear, total) => {
+    const yearGrid = document.getElementById('yearGrid');
+    yearGrid.innerHTML = '';  // Clear existing buttons
+    for (let year = startYear; year < startYear + total; year++) {
+        const yearButton = document.createElement('button');
+        yearButton.textContent = year;
+        yearButton.className = 'yearButton';
+        yearButton.addEventListener('click', () => {
+            selectedYear = year;
+            renderCalendar(selectedYear, selectedMonthIndex);
         });
+        yearGrid.appendChild(yearButton);
     }
+};
+// Render the calendar based on selected year and month
+const renderCalendar = (year, monthIndex) => {
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const calendarContainer = document.getElementById('calendarContainer');
+    calendarContainer.innerHTML = '';
+    calendarContainer.style.gridTemplateColumns = `150px repeat(${visibleDays}, 1fr)`;
+
+    // Header row for dates
+    const headerRow = createElement('div', 'calendar-row');
+    const roomLabelCell = createElement('div', 'room-label', 'Room');
+    headerRow.appendChild(roomLabelCell);
+
+    for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
+        const date = new Date(year, monthIndex, day);
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const dayCell = createElement('div', 'day-cell');
+        dayCell.innerHTML = `<div>${dayName}</div><div>${day}</div>`;  // Use innerHTML here
+        headerRow.appendChild(dayCell);
+    }
+    calendarContainer.appendChild(headerRow);
+
+    // Rows for room types and room numbers
+    Object.entries(roomDetails).forEach(([roomType, roomNumbers]) => {
+        const roomTypeRow = createElement('div', 'calendar-row room-type-row');
+        const roomTypeCell = createElement('div', 'room-type', roomType);
+        roomTypeRow.appendChild(roomTypeCell);
+
+        for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
+            const typeDateCell = createElement('div', 'date-cell');
+            typeDateCell.innerHTML = `<div><span class='total-box'>${roomNumbers.length}</span></div>`;  // Use innerHTML here
+            roomTypeRow.appendChild(typeDateCell);
+        }
+        calendarContainer.appendChild(roomTypeRow);
+
+        roomNumbers.forEach(roomNumber => {
+            const roomNumberRow = createElement('div', 'calendar-row room-number-row');
+            const roomNumberCell = createElement('div', 'room-number', roomNumber.toString());
+            roomNumberRow.appendChild(roomNumberCell);
+            for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
+                const numberDateCell = createElement('div', 'date-cell');
+                roomNumberRow.appendChild(numberDateCell);
+            }
+            calendarContainer.appendChild(roomNumberRow);
+        });
+    });
+};
+// Function to add hover effects to calendar cells
+const applyHoverEffects = () => {
+    const calendarContainer = document.getElementById('calendarContainer'); // Assuming this is the parent container of all rows
+
+    calendarContainer.addEventListener('mouseenter', event => {
+        const target = event.target;
+        if (target.classList.contains('date-cell')) {
+            const row = target.parentNode;
+            for (const child of row.children) {
+                child.classList.add('hover-effect');
+            }
+
+            const columnIndex = Array.from(row.children).indexOf(target);
+            const allRows = calendarContainer.querySelectorAll('.calendar-row');
+            for (const currentRow of allRows) {
+                const cell = currentRow.children[columnIndex];
+                if (cell) {
+                    cell.classList.add('hover-effect');
+                }
+            }
+        }
+    }, true); // Use capture phase to handle the event as it propagates up
+
+    calendarContainer.addEventListener('mouseleave', event => {
+        const target = event.target;
+        if (target.classList.contains('date-cell')) {
+            const allHovered = calendarContainer.querySelectorAll('.hover-effect');
+            for (const hovered of allHovered) {
+                hovered.classList.remove('hover-effect');
+            }
+        }
+    }, true); // Use capture phase to handle the event as it propagates up
+};
+
+// Initialize everything once the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const zoomInButton = document.getElementById('zoom-image');
+    zoomInButton.addEventListener('click', () => {
+        zoomLevel += 0.1;
+        document.body.style.zoom = zoomLevel;
+    });
+    populateSelect('reservationTypeSelect', reservationTypes, "Reservation Type");
+    populateSelect('roomTypeSelect', roomTypes, "Room Type");
+    populateSelect('floorSelect', floors, "Floor");
+    setupControls();  // Setup year and month navigation controls
+    populateYears(currentStartYear, totalYears);  // Populate the year buttons
+    renderCalendar(selectedYear, selectedMonthIndex);  // Render the initial view of the calendar
+    applyHoverEffects();  // Apply visual effects to the calendar
 });

@@ -14,31 +14,31 @@ body{
     max-width: 1500px;
     width:100%;
   }
-.topSearch{
+.top-search{
     display:flex;
     justify-content: space-between;
     align-items:center;
     margin:2rem 2rem 0 0;
 }
-.bellIcon{
+.bell-icon{
     width:1.5rem;
 }
-.front-head{
+.title-head{
     display:flex;
     justify-content: space-between;
     margin: 2rem;
 }
-.headPart{
+.head-part{
     font-size:2.4rem;
 }
-.headButton{
+.booking-button{
     background-color:#3A66FF;
     color: #fff;
     border-radius:2rem;
     border: none;
     padding: 0 1rem;
 }
-.navigationContainer {
+.navigation-container {
     display: grid;
     gap: 1rem;
     padding: 1rem;
@@ -46,7 +46,7 @@ body{
     border-radius: .5rem;
     margin: 2rem
 }
-.yearNavigation, .monthNavigationContainer {
+.year-navigation, .month-navicontainer {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
@@ -76,14 +76,15 @@ button{
     border:none;
     background-color: #E1E8FF;
 }
-.boxContainer{
+.box-container{
     display: flex;
     justify-content: space-between; 
 }
-.dropBox{
+.drop-box{
     display: flex;
     margin: 0 2rem;
     justify-content: space-around;
+    color:#858D9D;
 }
 .search-box {
     display: flex;  /* Using Flexbox for the layout */
@@ -112,12 +113,14 @@ select {
     border: 1px solid #ccc;
     border-radius: 2rem;
     padding: .5rem;
+    color:#858D9D;
 }
 .todayButton{
     border-radius: 1.3rem;
     background-color:#fff;
     border: 1px solid #DCDCDD;
     padding: 0 1rem;
+    color:#858D9D;
 }
 .zoom-button{
     width: 5rem;
@@ -129,7 +132,7 @@ select {
     cursor: pointer;
     padding: 0 1rem;
 }
-.filterButton  {
+.filter-button  {
     display: flex;
     justify-content: space-evenly;
     gap: .5rem;

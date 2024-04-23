@@ -52,11 +52,11 @@ body{
     align-items: center;
     gap: 5px;
 }
-#yearScrollContainer, #monthScrollContainer {
+#year-scroll-container, #month-scroll-container {
     overflow: auto;
     display: grid;
 }
-#yearGrid, #monthNavigation {
+#year-grid, #month-navigation {
     display: grid;
     grid-auto-flow: column; /* Lays out the grid items in a row */
     gap: 10px;

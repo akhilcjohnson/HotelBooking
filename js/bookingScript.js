@@ -51,13 +51,12 @@ const populateSelect = (selectId, options, placeholder) => {
         options.forEach(optionText => {
             selectElement.appendChild(createOption(optionText));
         });
-
 };
 
 // Setup UI controls for navigating the calendar
 const setupControls = () => {
-    const yearGrid = document.getElementById('yearGrid');
-    const monthNavigation = document.getElementById('monthNavigation');
+    const yearGrid = document.getElementById('year-grid');
+    const monthNavigation = document.getElementById('month-navigation');
     monthNavigation.innerHTML = '';  // Clear to prevent duplication
 
     // Setup month buttons
@@ -73,10 +72,10 @@ const setupControls = () => {
         const button = document.getElementById(buttonId);
         createButton(button, buttonId, button.innerText, adjustmentFunction);
     };
-    setupNavigationButton('prevButton', () => adjustYear(-1));
-    setupNavigationButton('nextButton', () => adjustYear(1));
-    setupNavigationButton('prevMonthButton', () => adjustMonth(-visibleDays));
-    setupNavigationButton('nextMonthButton', () => adjustMonth(visibleDays));
+    setupNavigationButton('prev-button', () => adjustYear(-1));
+    setupNavigationButton('next-button', () => adjustYear(1));
+    setupNavigationButton('prev-month-button', () => adjustMonth(-visibleDays));
+    setupNavigationButton('next-month-button', () => adjustMonth(visibleDays));
         
     return { yearGrid, monthNavigation };
 };
@@ -88,7 +87,6 @@ const adjustYear = (direction) => {
     populateYears(currentStartYear, totalYears);
     renderCalendar(selectedYear, selectedMonthIndex);
 };
-
 // Adjust the month within the visible range
 const adjustMonth = (increment) => {
     const daysInMonth = new Date(selectedYear, selectedMonthIndex + 1, 0).getDate();
@@ -103,7 +101,7 @@ const adjustSelectedYear = (currentSelected, start, total) => {
 
 // Populate the year buttons
 const populateYears = (startYear, total) => {
-    const yearGrid = document.getElementById('yearGrid');
+    const yearGrid = document.getElementById('year-grid');
     yearGrid.innerHTML = '';  // Clear existing buttons
     for (let year = startYear; year < startYear + total; year++) {
         const yearButton = document.createElement('button');
@@ -203,8 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomLevel += 0.1;
         document.body.style.zoom = zoomLevel;
     });
-    populateSelect('reservationTypeSelect', reservationTypes, "Reservation Type");
-    populateSelect('roomTypeSelect', roomTypes, "Room Type");
+    populateSelect('reservation-typeselect', reservationTypes, "Reservation Type");
+    populateSelect('room-typeselect', roomTypes, "Room Type");
     populateSelect('floorSelect', floors, "Floor");
     setupControls();  // Setup year and month navigation controls
     populateYears(currentStartYear, totalYears);  // Populate the year buttons

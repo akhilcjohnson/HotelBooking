@@ -61,7 +61,7 @@ body{
     grid-auto-flow: column; /* Lays out the grid items in a row */
     gap: 10px;
 }
-.yearButton, .monthButton {
+.yearButton, .month-button {
     text-align: center;
     min-width: 50px; /* Ensures buttons have a uniform size */
     cursor: pointer;
@@ -115,7 +115,7 @@ select {
     padding: .5rem;
     color:#858D9D;
 }
-.todayButton{
+.today-button{
     border-radius: 1.3rem;
     background-color:#fff;
     border: 1px solid #DCDCDD;
@@ -148,24 +148,24 @@ select {
 img{
     width: 15%;
 }
-.checkboxContainer {
+.checkbox-container {
     display: flex;
     justify-content: flex-end; /* Aligns children to the right */
     gap: 2rem; /* Adds space between the labels */
     margin: 2rem 2rem 1rem 0; 
 }
 
-.checkboxContainer label {
+.checkbox-container label {
     display: flex;
     align-items: center; 
     position: relative; /* Ensures correct positioning for pseudo-elements */
     margin: 0 1rem;
 }
-.checkboxContainer input[type="checkbox"] {
+.checkbox-container input[type="checkbox"] {
     visibility: hidden;
     position: absolute;
 }
-.checkboxContainer .checkmark {
+.checkbox-container .checkmark {
     position: relative;
     height: 1rem;
     width: 1rem;
@@ -173,13 +173,13 @@ img{
     margin-right: .5rem ; /* Space between the checkbox and the label text */
     display: inline-block; /* Necessary to keep label text aligned */
 }
-.checkboxContainer label:nth-child(1) .checkmark {
+.checkbox-container label:nth-child(1) .checkmark {
     background-color: #D4EFFA;
 }
-.checkboxContainer label:nth-child(2) .checkmark {
+.checkbox-container label:nth-child(2) .checkmark {
     background-color: #FEE5D3; 
 }
-.checkboxContainer label:nth-child(3) .checkmark {
+.checkbox-container label:nth-child(3) .checkmark {
     background-color: #DEE4CC;
 }
 .table {
@@ -271,8 +271,8 @@ img{
     color: #646464;  /* Adjusted color for clarity */
     margin-left: auto;  /* Pushes the ellipsis to the right */
 }
-
-
-
-
+.active {
+    background-color: #007BFF; /* Blue background for active button */
+    color: white; /* White text for active button */
+}
 

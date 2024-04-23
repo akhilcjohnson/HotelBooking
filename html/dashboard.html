@@ -23,22 +23,22 @@
         </div>
         <div class="navigation-container">
             <div class="year-navigation">
-                <button id="prev-button">&lt;</button>
+                <button id="prev-button"><i class="fas fa-angle-left"></i></button>
                 <div id="year-scroll-container">
                     <div id="year-grid">
                         <!-- Years will be inserted here as buttons -->
                     </div>
                 </div>
-                <button id="next-button">&gt;</button>
+                <button id="next-button"><i class="fas fa-angle-right"></i></button>
             </div>   
             <div class="month-navicontainer">
-                <button id="prev-month-button">&lt;</button>
+                <button id="prev-month-button"><i class="fas fa-angle-left"></i></button>
                 <div id="month-scroll-container">
                     <div id="month-navigation">
                         <!-- Month buttons will be inserted here -->
                     </div>
                 </div>
-                <button id="next-month-button">&gt;</button>
+                <button id="next-month-button"><i class="fas fa-angle-right"></i></button>
             </div>
         </div>
         <div class="box-container">
@@ -51,14 +51,14 @@
                     <img src="/images/icons8-align-64.png" alt="img">
                         Filter
                 </button>
-                <select name="reservation-type" id="reservation-typeselect"></select>
-                <select name="room-type" id="room-typeselect"> </select>
-                <select id="floorSelect"></select>
+                <select name="reservation-type" id="reservation-type-select"></select>
+                <select name="room-type" id="room-type-select"> </select>
+                <select id="floor-select"></select>
                 <button class="zoom-button" id="zoom-image" onclick="zoomIn()">+  -</button>
-                <button class="todayButton">Today</button>
+                <button class="today-button">Today</button>
             </div>
         </div>
-        <div class="checkboxContainer">
+        <div class="checkbox-container">
             <label>
                 <input type="checkbox">
                 <span class="checkmark"></span>
@@ -76,8 +76,8 @@
             </label>
         </div>
         
-        <div id="calendarContainer" class="calendar-grid">
-            <div id="roomTotalsContainer" class="room-totals"></div>
+        <div id="calendar-container" class="calendar-grid">
+            <div id="room-totals-container" class="room-totals"></div>
         </div>  
     </div>
     <script src="/js/bookingScript.js"></script>

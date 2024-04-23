@@ -16,14 +16,14 @@ let selectedMonthIndex = 0;
 let currentStartIndex = 0;
 let zoomLevel = 1;
 
-const createElement = (tagName, className, textContent = '') => {
+const createElements = (tagName, className, textContent = '') => {
     const element = document.createElement(tagName);
     element.className = className;
     if (textContent) element.textContent = textContent;
     return element;
 };
 const createButton = (container, className, text, onClick) => {
-    const button = createElement('button', className, text);
+    const button = createElements('button', className, text);
     button.addEventListener('click', onClick);
     container.appendChild(button);
     return button;
@@ -55,31 +55,36 @@ const populateSelect = (selectId, options, placeholder) => {
 
 // Setup UI controls for navigating the calendar
 const setupControls = () => {
-    const yearGrid = document.getElementById('year-grid');
     const monthNavigation = document.getElementById('month-navigation');
     monthNavigation.innerHTML = '';  // Clear to prevent duplication
-
     // Setup month buttons
     months.forEach((month, index) => {
-        createButton(monthNavigation, 'monthButton', month, () => {
+        const button = createButton(monthNavigation, 'month-button', month, () => {
+            // Remove active class from all buttons first
+            document.querySelectorAll('.month-button').forEach(btn => btn.classList.remove('active'));
+            // Set the active class on the clicked button
+            button.classList.add('active');
             selectedMonthIndex = index;
             renderCalendar(selectedYear, selectedMonthIndex);
         });
+        // Initially set the active class if it's the current month
+        if (index === selectedMonthIndex) {
+            button.classList.add('active');
+        }
     });
-
+    
     // Setup year and month navigation buttons
     const setupNavigationButton = (buttonId, adjustmentFunction) => {
         const button = document.getElementById(buttonId);
-        createButton(button, buttonId, button.innerText, adjustmentFunction);
+        button.addEventListener('click', adjustmentFunction);
     };
     setupNavigationButton('prev-button', () => adjustYear(-1));
     setupNavigationButton('next-button', () => adjustYear(1));
     setupNavigationButton('prev-month-button', () => adjustMonth(-visibleDays));
     setupNavigationButton('next-month-button', () => adjustMonth(visibleDays));
-        
-    return { yearGrid, monthNavigation };
+    
+    return { monthNavigation };
 };
-
 // Adjust the year by increments of 5 years
 const adjustYear = (direction) => {
     currentStartYear += direction * 5;
@@ -103,33 +108,43 @@ const adjustSelectedYear = (currentSelected, start, total) => {
 const populateYears = (startYear, total) => {
     const yearGrid = document.getElementById('year-grid');
     yearGrid.innerHTML = '';  // Clear existing buttons
+
     for (let year = startYear; year < startYear + total; year++) {
         const yearButton = document.createElement('button');
         yearButton.textContent = year;
         yearButton.className = 'yearButton';
         yearButton.addEventListener('click', () => {
+            // Remove active class from all year buttons
+            document.querySelectorAll('.yearButton').forEach(btn => btn.classList.remove('active'));
+            // Add active class to the clicked button
+            yearButton.classList.add('active');
             selectedYear = year;
             renderCalendar(selectedYear, selectedMonthIndex);
         });
+        // Set the active class if it's the currently selected year
+        if (year === selectedYear) {
+            yearButton.classList.add('active');
+        }
         yearGrid.appendChild(yearButton);
     }
 };
+
 // Render the calendar based on selected year and month
 const renderCalendar = (year, monthIndex) => {
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-    const calendarContainer = document.getElementById('calendarContainer');
+    const calendarContainer = document.getElementById('calendar-container');
     calendarContainer.innerHTML = '';
     calendarContainer.style.gridTemplateColumns = `150px repeat(${visibleDays}, 1fr)`;
 
     // Header row for dates
-    const headerRow = createElement('div', 'calendar-row');
-    const roomLabelCell = createElement('div', 'room-label', 'Room');
+    const headerRow = createElements('div', 'calendar-row');
+    const roomLabelCell = createElements('div', 'room-label', 'Room');
     headerRow.appendChild(roomLabelCell);
 
     for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
         const date = new Date(year, monthIndex, day);
         const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const dayCell = createElement('div', 'day-cell');
+        const dayCell = createElements('div', 'day-cell');
         dayCell.innerHTML = `<div>${dayName}</div><div>${day}</div>`;  // Use innerHTML here
         headerRow.appendChild(dayCell);
     }
@@ -137,23 +152,23 @@ const renderCalendar = (year, monthIndex) => {
 
     // Rows for room types and room numbers
     Object.entries(roomDetails).forEach(([roomType, roomNumbers]) => {
-        const roomTypeRow = createElement('div', 'calendar-row room-type-row');
-        const roomTypeCell = createElement('div', 'room-type', roomType);
+        const roomTypeRow = createElements('div', 'calendar-row room-type-row');
+        const roomTypeCell = createElements('div', 'room-type', roomType);
         roomTypeRow.appendChild(roomTypeCell);
 
         for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
-            const typeDateCell = createElement('div', 'date-cell');
+            const typeDateCell = createElements('div', 'date-cell');
             typeDateCell.innerHTML = `<div><span class='total-box'>${roomNumbers.length}</span></div>`;  // Use innerHTML here
             roomTypeRow.appendChild(typeDateCell);
         }
         calendarContainer.appendChild(roomTypeRow);
 
         roomNumbers.forEach(roomNumber => {
-            const roomNumberRow = createElement('div', 'calendar-row room-number-row');
-            const roomNumberCell = createElement('div', 'room-number', roomNumber.toString());
+            const roomNumberRow = createElements('div', 'calendar-row room-number-row');
+            const roomNumberCell = createElements('div', 'room-number', roomNumber.toString());
             roomNumberRow.appendChild(roomNumberCell);
             for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
-                const numberDateCell = createElement('div', 'date-cell');
+                const numberDateCell = createElements('div', 'date-cell');
                 roomNumberRow.appendChild(numberDateCell);
             }
             calendarContainer.appendChild(roomNumberRow);
@@ -162,7 +177,7 @@ const renderCalendar = (year, monthIndex) => {
 };
 // Function to add hover effects to calendar cells
 const applyHoverEffects = () => {
-    const calendarContainer = document.getElementById('calendarContainer'); // Assuming this is the parent container of all rows
+    const calendarContainer = document.getElementById('calendar-container'); // Assuming this is the parent container of all rows
 
     calendarContainer.addEventListener('mouseenter', event => {
         const target = event.target;
@@ -201,9 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
         zoomLevel += 0.1;
         document.body.style.zoom = zoomLevel;
     });
-    populateSelect('reservation-typeselect', reservationTypes, "Reservation Type");
-    populateSelect('room-typeselect', roomTypes, "Room Type");
-    populateSelect('floorSelect', floors, "Floor");
+    populateSelect('reservation-type-select', reservationTypes, "Reservation Type");
+    populateSelect('room-type-select', roomTypes, "Room Type");
+    populateSelect('floor-select', floors, "Floor");
     setupControls();  // Setup year and month navigation controls
     populateYears(currentStartYear, totalYears);  // Populate the year buttons
     renderCalendar(selectedYear, selectedMonthIndex);  // Render the initial view of the calendar

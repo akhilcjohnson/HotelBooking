@@ -242,7 +242,7 @@ img{
     padding: 1rem .5rem;
     text-align:center;
 }
-.total-box {
+.total-box, .total-rooms {
     display: inline-block;
     padding: 2px 5px;   
     background-color: #5177FF;

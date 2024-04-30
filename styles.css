@@ -219,19 +219,47 @@ img{
     width: 96%;
     border-radius:1rem
 }
-.calendar-row {
+.calendar-row, .room-type-container {
     display: contents;
 }
+
+
+.room-type-row {
+    cursor: pointer; /* Indicates the row is clickable */
+    user-select: none; /* Prevents text selection on click */
+}
+
+.room-number-container {
+    transition: all 0.3s ease; /* Smooth transition for collapsing and expanding */
+}
+
+.room-type-container {
+    margin-bottom: 10px; /* Spacing between each room type */
+    border: 1px solid #ccc; /* Optional border for better visibility */
+}
+
+.hidden {
+    display: none;
+}
+
 .room-type, .day-cell {
     border: 1px solid #E3EAFF;
-    padding: 1rem .5rem;
+    padding: 1rem 1rem;
     font-size:1.2rem;
 }
+.room-type {
+    display: flex;
+    justify-content: space-around; /* Aligns children (text and icon) on opposite ends */
+    align-items: center; /* Centers children vertically */
+    width: 100%; /* Ensures the div takes up the full width of its container */
+    padding-left: 0;
+}
+
 .day-cell{
     text-align:center;
 }
 .room-label,.room-number, .table-row {
-    padding: .8rem;
+    padding: 1rem;
     border: 1px solid #E3EAFF;
 }
 .hover-effect {
@@ -242,7 +270,7 @@ img{
     padding: 1rem .5rem;
     text-align:center;
 }
-.total-box, .total-rooms {
+ .total-rooms-available {
     display: inline-block;
     padding: 2px 5px;   
     background-color: #5177FF;
@@ -271,8 +299,25 @@ img{
     color: #646464;  /* Adjusted color for clarity */
     margin-left: auto;  /* Pushes the ellipsis to the right */
 }
+
+.total-room-not-available {
+    background-color: #FF3F3F;  /* Red background indicates no rooms are available */
+    color: white;  /* White text for contrast */
+    padding: 2px 5px;  /* Consistent padding */
+}
+.booking-indicator {
+    display: block;
+    width: 100%; /* Fill the cell */
+    height: 100%;
+    background-color: red; /* Highlight booked dates */
+    opacity: 0.5; /* Make the color less intense so text can be seen if needed */
+    color: white;
+    text-align: center;
+    line-height: 30px; /* Align text vertically */
+}
 .active {
     background-color: #007BFF; /* Blue background for active button */
     color: white; /* White text for active button */
 }
+
 

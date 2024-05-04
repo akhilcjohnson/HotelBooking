@@ -19,6 +19,8 @@ body{
     justify-content: space-between;
     align-items:center;
     margin:2rem 2rem 0 0;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #ccc;
 }
 .bell-icon{
     width:1.5rem;
@@ -28,7 +30,7 @@ body{
     justify-content: space-between;
     margin: 2rem;
 }
-.head-part{
+.heading-part{
     font-size:2.4rem;
 }
 .booking-button{
@@ -305,19 +307,52 @@ img{
     color: white;  /* White text for contrast */
     padding: 2px 5px;  /* Consistent padding */
 }
-.booking-indicator {
+.span-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.date-cell.booked {
     display: block;
     width: 100%; /* Fill the cell */
-    height: 100%;
-    background-color: red; /* Highlight booked dates */
-    opacity: 0.5; /* Make the color less intense so text can be seen if needed */
-    color: white;
+    background-color: #FEE5D3; /* Highlight booked dates */
+    color: #F87416;
     text-align: center;
-    line-height: 30px; /* Align text vertically */
+    font-size: 1rem; /* Align text vertically */
+    border-radius: .3rem;
+    border: 1px solid; /* Default border for all sides */
+    border-left: 4px solid; /* Thicker left border */
+    margin: .5rem 0;
+    padding: .4rem;
 }
+
 .active {
     background-color: #007BFF; /* Blue background for active button */
     color: white; /* White text for active button */
 }
 
+.date-cell.occupied {
+    background-color: #D4EFFA; /* Red for occupied today */
+    color: #28ADE4;
+    text-align: center;
+    font-size: 1rem; /* Align text vertically */
+    border-radius: .3rem;
+    border: 1px solid #28ADE4;
+    border-left: 4px solid;
+    margin:.5rem 0;
+    padding: .4rem;
+}
 
+
+.date-cell.out-of-order {
+    display: block;
+    background-color: #DEE4CC; /* Light Grey for out of order or past bookings */
+    color: #65820E;
+    text-align: left;
+    font-size: 1rem; /* Align text vertically */
+    border-radius: .3rem;
+    border: 1px solid #28ADE4;
+    border-left: 4px solid;
+    margin:.5rem 0;
+    padding: .4rem;
+}

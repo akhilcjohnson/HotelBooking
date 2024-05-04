@@ -126,48 +126,79 @@ const populateMonths = (months) => {
 };
 
 // Function to book a room and update room availability
-const bookRoom = (roomType, roomNumber, startDate, endDate)=>{
-    const start = new Date(startDate + 'T00:00:00Z');
-    const end = new Date(endDate + 'T00:00:00Z');
+const bookRoom = (roomType, roomNumber, startDate, endDate, occupant) => {
+    // Parse dates assuming they are in local timezone
+    const start = new Date(startDate + 'T00:00:00'); // Append time part to specify exact time
+    const end = new Date(endDate + 'T00:00:00');
 
-    for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
-        const dateKey = d.toISOString().split('T')[0];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dateKey = d.toISOString().split('T')[0]; // Convert to ISO string then split to get date part
         if (!bookings[dateKey]) {
             bookings[dateKey] = {};
         }
         if (!bookings[dateKey][roomType]) {
-            bookings[dateKey][roomType] = new Set();
+            bookings[dateKey][roomType] = {};
         }
-        bookings[dateKey][roomType].add(roomNumber);
+        bookings[dateKey][roomType][roomNumber] = occupant;
     }
-}
-
+};
 
 // Function to get the number of available rooms for a specific type on a date
 const getAvailableRooms = (roomType, date) => {
     const dateKey = date.toISOString().split('T')[0];
     const bookedRoomsOnDate = bookings[dateKey] && bookings[dateKey][roomType];
-    const totalRoomsOfType = roomDetails[roomType].length;
-    return totalRoomsOfType - (bookedRoomsOnDate ? bookedRoomsOnDate.size : 0);
+    const totalRoomsOfType = roomDetails[roomType] ? roomDetails[roomType].length : 0; // Ensure default to 0 if undefined
+    return totalRoomsOfType - (bookedRoomsOnDate ? Object.keys(bookedRoomsOnDate).length : 0);
 }
-const updateAvailability = (dayCell, date) => {
-    let totalAvailableRooms = 0;
-    const availabilityHtml = Object.entries(roomDetails).map(([type, numbers]) => {
-        const availableCount = getAvailableRooms(type, date);
-        totalAvailableRooms += availableCount;
-        return `<div>${type}: ${availableCount} available of ${numbers.length}</div>`;
-    }).join('');
-
-    const totalRoomsClass = totalAvailableRooms > 0 ? 'total-rooms-available' : 'total-room-not-available';
-    dayCell.innerHTML += `<div class="${totalRoomsClass}">${totalAvailableRooms}</div>`;
-};
 
 // Add the helper function to check bookings
-const checkIfBooked = (roomType, roomNumber, date) => {
+const checkRoomStatus = (roomType, roomNumber, date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);  // Normalize today's date to start of the day
+
     const dateKey = date.toISOString().split('T')[0];
     const bookingsOnDate = bookings[dateKey] && bookings[dateKey][roomType];
-    return bookingsOnDate ? bookingsOnDate.has(roomNumber) : false;
-}
+    if (bookingsOnDate && bookingsOnDate[roomNumber]) {
+        const occupant = bookingsOnDate[roomNumber];
+        const bookingDate = new Date(dateKey);
+        bookingDate.setHours(0, 0, 0, 0);
+
+        // Future booking
+        if (bookingDate > today) {
+            return `Booked by ${occupant}`;
+        }
+
+        // Current or past booking (up to and including today)
+        const endDate = getBookingEndDate(roomType, roomNumber, bookingDate);
+        if (endDate >= today) {
+            return `Occupied by ${occupant}`;
+        }
+
+        // Past booking where end date has passed
+        if (endDate < today) {
+            return `out of order: ${occupant}`;
+        }
+    }
+    return '';
+};
+
+// Helper function to find the end date of a current booking
+const getBookingEndDate = (roomType, roomNumber, startDate) => {
+    let currentDate = new Date(startDate);
+    while (true) {
+        let nextDay = new Date(currentDate);
+        nextDay.setDate(nextDay.getDate() + 1);
+        let nextDayKey = nextDay.toISOString().split('T')[0];
+        if (!bookings[nextDayKey] || !bookings[nextDayKey][roomType] || !bookings[nextDayKey][roomType][roomNumber]) {
+            break;
+        }
+        currentDate = nextDay;
+    }
+    return currentDate;  // Return the last day of the booking
+};
+
+
+
 const appendDateCells = (year, monthIndex, daysInMonth, parentElement) => {
     for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
         const date = new Date(year, monthIndex, day);
@@ -186,39 +217,90 @@ const appendRoomTypeCells = (year, monthIndex, daysInMonth, roomType, parentElem
         parentElement.appendChild(typeDateCell);
     }
 };
+
+
+// Update the room number row to display booking status
+// This function now checks for bookings and spans them across multiple cells.
 const createRoomNumberRow = (roomNumber, year, monthIndex, daysInMonth, roomType) => {
     const roomNumberRow = createElements('div', 'calendar-row room-number-row');
     const roomNumberCell = createElements('div', 'room-number', roomNumber.toString());
     roomNumberRow.appendChild(roomNumberCell);
 
-    for (let day = currentStartIndex + 1; day <= Math.min(currentStartIndex + visibleDays, daysInMonth); day++) {
+    let day = currentStartIndex + 1;
+    while (day <= Math.min(currentStartIndex + visibleDays, daysInMonth)) {
         const date = new Date(year, monthIndex, day);
-        const isBooked = checkIfBooked(roomType, roomNumber, date);
-        const numberDateCell = createElements('div', 'date-cell', isBooked ? 'Booked' : '');
-        roomNumberRow.appendChild(numberDateCell);
+        const status = checkRoomStatus(roomType, roomNumber, date);
+        if (status) {
+            const statusEndDay = getStatusEndDay(roomType, roomNumber, date);
+            const statusClass = getStatusClass(status);
+            const spanLength = statusEndDay - day + 1;
+            const numberDateCell = createElements('div', `date-cell ${statusClass}`, `<span>${status}</span>`);
+            numberDateCell.style.gridColumnEnd = `span ${spanLength}`;
+            roomNumberRow.appendChild(numberDateCell);
+            day += spanLength; // Move the start day to the end of the current booking
+        } else {
+            const numberDateCell = createElements('div', 'date-cell', '');
+            roomNumberRow.appendChild(numberDateCell);
+            day++;
+        }
     }
     return roomNumberRow;
+};
+
+// Calculate the end day of a current booking status
+const getStatusEndDay = (roomType, roomNumber, startDate) => {
+    const startKey = startDate.toISOString().split('T')[0];
+    let currentDate = new Date(startDate);
+    while (bookings[startKey] && bookings[startKey][roomType] && bookings[startKey][roomType][roomNumber]) {
+        currentDate.setDate(currentDate.getDate() + 1);
+        const currentKey = currentDate.toISOString().split('T')[0];
+        if (!bookings[currentKey] || !bookings[currentKey][roomType] || !bookings[currentKey][roomType][roomNumber]) {
+            break;
+        }
+    }
+    return currentDate.getDate() - 1; // Return the last day of the booking
+};
+
+
+const getStatusClass = (status) => {
+    if (status.includes('Occupied by')) return 'occupied';
+    if (status.includes('Booked by')) return 'booked';
+    if (status.includes('out of order')) return 'out-of-order'; // Notice the case sensitivity
+    return '';
+}
+
+
+
+// Function to update availability visually in the day cell
+const updateAvailability = (dayCell, date) => {
+    let totalAvailableRooms = 0;
+    const availabilityHtml = Object.entries(roomDetails).map(([type, numbers]) => {
+        const availableCount = getAvailableRooms(type, date);
+        totalAvailableRooms += availableCount;
+        return `<div>${type}: ${availableCount} available of ${numbers.length}</div>`;
+    });
+
+    const totalRoomsClass = totalAvailableRooms > 0 ? 'total-rooms-available' : 'total-room-not-available';
+    dayCell.innerHTML += `<div class="${totalRoomsClass}">${totalAvailableRooms}</div>`;
 };
 
 const renderCalendar = (year, monthIndex) => {
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
     const calendarContainer = document.getElementById('calendar-container');
-    calendarContainer.innerHTML = ''; // Clear existing contents
-    calendarContainer.style.gridTemplateColumns = `150px repeat(${visibleDays}, 1fr)`; // Set grid columns
+    calendarContainer.innerHTML = '';
+    calendarContainer.style.gridTemplateColumns = `150px repeat(${visibleDays}, 1fr)`;
 
-    // Create and append the header row for dates
     const headerRow = createElements('div', 'calendar-row');
     const roomLabelCell = createElements('div', 'room-label', 'Room');
     headerRow.appendChild(roomLabelCell);
     appendDateCells(year, monthIndex, daysInMonth, headerRow);
     calendarContainer.appendChild(headerRow);
 
-    // Process each room type and room number
     Object.entries(roomDetails).forEach(([roomType, roomNumbers]) => {
         const roomTypeContainer = createRoomTypeContainer(roomType, roomNumbers, year, monthIndex, daysInMonth);
         calendarContainer.appendChild(roomTypeContainer);
     });
-}
+};  
 
 // This function creates and returns a room type container with all its elements
 const createRoomTypeContainer = (roomType, roomNumbers, year, monthIndex, daysInMonth) => {
@@ -255,8 +337,6 @@ const toggleRoomNumbers = (container) => {
     const rows = container.getElementsByClassName('room-number-row');
     Array.from(rows).forEach(row => row.classList.toggle('hidden'));
 }
-
-
 
 // Function to add hover effects to calendar cells
 const applyHoverEffects = () => {
@@ -303,16 +383,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setupControls();  // Setup year and month navigation controls
     populateYears(currentStartYear, totalYears);  // Populate the year buttons
     populateMonths(months);
-    bookRoom('Single Room', 101, '2024-01-08', '2024-01-10');
-    bookRoom('Single Room', 102, '2024-01-01', '2024-01-03');
-    bookRoom('Single Room', 103, '2024-01-10', '2024-01-12');
-    bookRoom('Double Room', 201, '2024-01-03', '2024-01-05');
-    bookRoom('Family Room', 301, '2024-01-01', '2024-01-02');
-    bookRoom('Single Room', 103, '2024-01-06', '2024-01-08');
-    bookRoom('Single Room', 102, '2024-01-06', '2024-01-07');
-    bookRoom('Single Room', 101, '2024-01-04', '2024-01-06');
-    
+    bookRoom('Single Room', 101, '2024-05-08', '2024-05-09', 'Alice');
+    bookRoom('Single Room', 103, '2024-05-04', '2024-05-05', 'Bob');
+    bookRoom('Single Room', 102, '2024-05-03', '2024-05-04', 'Angel');
+    bookRoom('Double Room', 202, '2024-01-01', '2024-01-03', 'Babu');
+    bookRoom('Single Room', 101, '2024-05-04', '2024-05-05', 'Ancy');
+    bookRoom('Family Room', 302, '2024-05-04', '2024-05-05', 'Biju');
+    bookRoom('Double Room', 201, '2024-05-01', '2024-05-02', 'Anu');
+    bookRoom('Single Room', 102, '2024-05-09', '2024-05-10', 'Baiju');
     // Assume the current month to render is January 2024 to see the bookings
     renderCalendar(2024, 0);  // Rendering January 2024
     applyHoverEffects();  // Apply visual effects to the calendar
+    
 });
